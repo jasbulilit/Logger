@@ -1,0 +1,16 @@
+{
+	"name": "jasbulilit/simple-logger",
+	"keywords": ["log", "logging", "psr-3"],
+	"type": "library",
+	"license": "MIT",
+	"require": {
+		"php": ">=5.3",
+		"psr/log": "~1.0"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "~4.0"
+	},
+	"autoload": {
+		"psr-4": {"SimpleLogger\\": "src/"}
+	}
+}

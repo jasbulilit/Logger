@@ -6,7 +6,9 @@
  * @link	https://github.com/jasbulilit/Logger
  * @package	SimpleLogger
  */
-namespace SimpleLogger;
+namespace SimpleLogger\Writer;
+
+use SimpleLogger\LogLevel;
 
 /**
  * Write log to file or stram

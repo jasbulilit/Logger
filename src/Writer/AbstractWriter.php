@@ -6,7 +6,11 @@
  * @link	https://github.com/jasbulilit/Logger
  * @package	SimpleLogger
  */
-namespace SimpleLogger;
+namespace SimpleLogger\Writer;
+
+use SimpleLogger\WriterInterface;
+use SimpleLogger\LogLevel;
+use SimpleLogger\LogItem;
 
 abstract class AbstractWriter implements WriterInterface {
 

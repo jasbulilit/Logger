@@ -8,7 +8,9 @@
  */
 namespace SimpleLogger;
 
-class Logger {
+use Psr\Log\LoggerInterface;
+
+class Logger implements LoggerInterface {
 
 	/**
 	 * @var array
