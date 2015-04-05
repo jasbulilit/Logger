@@ -1,15 +1,28 @@
 <?php
 /**
- * SimpleLogWriter
+ * SimpleLogger
  *
- * @author jasbulilit
+ * @author	Jasmine
+ * @link	https://github.com/jasbulilit/Logger
+ * @package	SimpleLogger
  */
 namespace SimpleLogger;
 
+/**
+ * Write log to file or stram
+ */
 class FileWriter extends AbstractWriter {
 
+	/**
+	 * @var resource
+	 */
 	private $_stream;
 
+	/**
+	 * @param resource|string $streamOrFile	resource or filepath/url to open as a stream
+	 * @param integer $level
+	 * @throws \InvalidArgumentException|\RuntimeException
+	 */
 	public function __construct($streamOrFile, $level = LogLevel::INFO) {
 		if (is_resource($streamOrFile)) {
 			if ('stream' != get_resource_type($streamOrFile)) {
@@ -26,19 +39,13 @@ class FileWriter extends AbstractWriter {
 		$this->setLevel($level);
 	}
 
-	protected function format(LogItem $log) {
-		return sprintf(
-			'[%s] %s: %s%s in %s on line %s',
-			$log['timestamp']->format('Y/m/d H:i:s'),
-			$log['level']->getName(),
-			(isset($log['caller']['method'])) ? $log['caller']['method'] . ': ' : '',
-			$log['message'],
-			$log['caller']['file'],
-			$log['caller']['line']
-		);
-	}
-
+	/**
+	 * Write a message to the log
+	 *
+	 * @param string $formatted_log
+	 * @return void
+	 */
 	protected function doWrite($formatted_log) {
-		fwrite($this->stream,  $formatted_log. PHP_EOL);
+		fwrite($this->stream,  $formatted_log . PHP_EOL);
 	}
 }

@@ -2,11 +2,19 @@
 /**
  * SimpleLogger
  *
- * @author jasbulilit
+ * @author	Jasmine
+ * @link	https://github.com/jasbulilit/Logger
+ * @package	SimpleLogger
  */
 namespace SimpleLogger;
 
+/**
+ * Log level supports the logging levels described by RFC 5424.
+ *
+ * @link http://tools.ietf.org/html/rfc5424
+ */
 class LogLevel {
+
 	const EMERGENCY		= 1;
 	const ALERT			= 2;
 	const CRITICAL		= 3;
@@ -19,7 +27,7 @@ class LogLevel {
 	protected static $levels = array(
 		self::EMERGENCY	=> 'EMERGENCY',
 		self::ALERT		=> 'ALERT',
-		self::CRITICAL	=> '',
+		self::CRITICAL	=> 'CRITICAL',
 		self::ERROR		=> 'ERROR',
 		self::WARNING	=> 'WARNING',
 		self::NOTICE	=> 'NOTICE',
@@ -27,25 +35,45 @@ class LogLevel {
 		self::DEBUG		=> 'DEBUG'
 	);
 
+	/**
+	 * @param integer $level
+	 * @throws \InvalidArgumentException
+	 */
 	public function __construct($level) {
 		if (! isset(self::$levels[$level])) {
-			throw new \InvalidArgumentException('Invalid level.');
+			throw new \InvalidArgumentException('Invalid level: ' . $level);
 		}
 		$this->_level = $level;
 	}
 
-	public function getName() {
+	/**
+	 * @return string
+	 */
+	public function getSeverity() {
 		return self::$levels[$this->_level];
 	}
 
+	/**
+	 * @return integer
+	 */
 	public function getLevel() {
 		return $this->_level;
 	}
 
+	/**
+	 * @return integer
+	 */
 	public function getPriority() {
+		// currently, priority equal to level
 		return $this->_level;
 	}
 
+	/**
+	 * Compare priority
+	 *
+	 * @param LogLevel $log_level
+	 * @return integer return 1 if $log_level is greater priority than this LogLevel, -1 if less priority, and 0 if equal
+	 */
 	public function comparePriority(LogLevel $log_level) {
 		if ($this->getPriority() == $log_level->getPriority()) {
 			return 0;
