@@ -32,11 +32,22 @@ class LogItem extends \ArrayObject {
 	 * @throws \InvalidArgumentException
 	 * @return mixed
 	 */
-	public function get($key) {
+	public function offsetGet($key) {
 		if (! $this->offsetExists($key)) {
 			throw new \InvalidArgumentException('Invalid key: ' . $key);
 		}
 		return parent::offsetGet($key);
+	}
+
+	/**
+	 * Alias of offsetGet()
+	 *
+	 * @param string $key
+	 * @throws \InvalidArgumentException
+	 * @return mixed
+	 */
+	public function get($key) {
+		return $this->offsetGet($key);
 	}
 
 	/**

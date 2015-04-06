@@ -68,6 +68,13 @@ abstract class AbstractWriter implements WriterInterface {
 	}
 
 	/**
+	 * @param array
+	 */
+	public function getTargetClassList() {
+		return $this->target_classes;
+	}
+
+	/**
 	 * Filter log item, return true to accept log
 	 *
 	 * @param LogItem $log
@@ -104,14 +111,32 @@ abstract class AbstractWriter implements WriterInterface {
 	 * @return string
 	 */
 	protected function format(LogItem $log) {
+		$method = '';
+		$caller_info = '';
+		if ($log->has('caller')) {
+			$caller = $log->caller;
+
+			if (isset($caller['method'])) {
+				$method = $caller['method'] . ': ';
+			}
+			$caller_info = sprintf(' in %s on line %s', $caller['file'], $caller['line']);
+		}
+
+		$trace = '';
+		if ($log->has('context')
+			&& isset($log->context['exception'])
+			&& $log->context['exception'] instanceof \Exception) {
+			$trace = "\n" . $log->context['exception']->getTraceAsString();
+		}
+
 		return sprintf(
-			'[%s] %s: %s%s in %s on line %s',
-			$log['timestamp']->format('Y/m/d H:i:s'),
-			$log['level']->getSeverity(),
-			(isset($log['caller']['method'])) ? $log['caller']['method'] . ': ' : '',
-			$log['message'],
-			$log['caller']['file'],
-			$log['caller']['line']
+			'[%s] %s: %s%s%s%s',
+			$log->timestamp->format('Y/m/d H:i:s'),
+			$log->level->getSeverity(),
+			$method,
+			$log->message,
+			$caller_info,
+			$trace
 		);
 	}
 
