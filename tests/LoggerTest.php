@@ -26,7 +26,7 @@ class LoggerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::getWriters
 	 */
 	public function testAddWriter() {
-		$writer = new Writer\MockWriter(LogLevel::DEBUG);
+		$writer = $this->getMock('\SimpleLogger\WriterInterface');
 
 		$logger = new Logger();
 		$logger->addWriter($writer);
