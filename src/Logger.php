@@ -22,6 +22,8 @@ class Logger implements LoggerInterface {
 	 */
 	private $_name;
 
+	private $_caller_skip_count = 1;
+
 	/**
 	 * @param string $name	logger channel name
 	 */
@@ -54,6 +56,13 @@ class Logger implements LoggerInterface {
 	 */
 	public function addWriter(WriterInterface $writer) {
 		$this->writers[] = $writer;
+	}
+
+	/**
+	 * @param integer $skip_count
+	 */
+	public function setCallerSkipCount($skip_count) {
+		$this->_caller_skip_count = $skip_count;
 	}
 
 	/**
@@ -206,7 +215,10 @@ class Logger implements LoggerInterface {
 
 		$caller = array();
 
-		$trace = array_shift($trace_list);	// log()
+		for ($i=0; $i<$this->_caller_skip_count; $i++) {
+			$trace = array_shift($trace_list);
+		}
+
 		if (isset($trace_list[0])
 			&& $trace_list[0]['class'] == __CLASS__) {
 			$trace = array_shift($trace_list);
