@@ -22,7 +22,7 @@ class Logger implements LoggerInterface {
 	 */
 	private $_name;
 
-	private $_caller_skip_count = 1;
+	private $_caller_skip_count = 0;
 
 	/**
 	 * @param string $name	logger channel name
@@ -61,8 +61,15 @@ class Logger implements LoggerInterface {
 	/**
 	 * @param integer $skip_count
 	 */
-	public function setCallerSkipCount($skip_count) {
-		$this->_caller_skip_count = $skip_count;
+	public function addCallerSkipCount($skip_count) {
+		$this->_caller_skip_count += $skip_count;
+	}
+
+	/**
+	 * @return integer
+	 */
+	public function getCallerSkipCount() {
+		return $this->_caller_skip_count;
 	}
 
 	/**
@@ -73,6 +80,7 @@ class Logger implements LoggerInterface {
 	 * @return void
 	 */
 	public function emergency($message, array $context = array()) {
+		$this->addCallerSkipCount(1);
 		$this->log(LogLevel::EMERGENCY, $message, $context);
 	}
 
@@ -84,6 +92,7 @@ class Logger implements LoggerInterface {
 	 * @return void
 	 */
 	public function alert($message, array $context = array()) {
+		$this->addCallerSkipCount(1);
 		$this->log(LogLevel::ALERT, $message, $context);
 	}
 
@@ -95,6 +104,7 @@ class Logger implements LoggerInterface {
 	 * @return void
 	 */
 	public function critical($message, array $context = array()) {
+		$this->addCallerSkipCount(1);
 		$this->log(LogLevel::CRITICAL, $message, $context);
 	}
 
@@ -106,6 +116,7 @@ class Logger implements LoggerInterface {
 	 * @return void
 	 */
 	public function error($message, array $context = array()) {
+		$this->addCallerSkipCount(1);
 		$this->log(LogLevel::ERROR, $message, $context);
 	}
 
@@ -117,6 +128,7 @@ class Logger implements LoggerInterface {
 	 * @return void
 	 */
 	public function warning($message, array $context = array()) {
+		$this->addCallerSkipCount(1);
 		$this->log(LogLevel::WARNING, $message, $context);
 	}
 
@@ -128,6 +140,7 @@ class Logger implements LoggerInterface {
 	 * @return void
 	 */
 	public function notice($message, array $context = array()) {
+		$this->addCallerSkipCount(1);
 		$this->log(LogLevel::NOTICE, $message, $context);
 	}
 
@@ -139,6 +152,7 @@ class Logger implements LoggerInterface {
 	 * @return void
 	 */
 	public function info($message, array $context = array()) {
+		$this->addCallerSkipCount(1);
 		$this->log(LogLevel::INFO, $message, $context);
 	}
 
@@ -150,6 +164,7 @@ class Logger implements LoggerInterface {
 	 * @return void
 	 */
 	public function debug($message, array $context = array()) {
+		$this->addCallerSkipCount(1);
 		$this->log(LogLevel::DEBUG, $message, $context);
 	}
 
@@ -167,6 +182,7 @@ class Logger implements LoggerInterface {
 			$message = var_export($message, true);
 		}
 
+		$this->addCallerSkipCount(1);
 		$caller = $this->_getCaller();
 
 		$log = new LogItem(array(
