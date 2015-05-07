@@ -122,19 +122,25 @@ abstract class AbstractWriter implements WriterInterface {
 			$caller_info = sprintf(' in %s on line %s', $caller['file'], $caller['line']);
 		}
 
+		$context_info = '';
 		$trace = '';
-		if ($log->has('context')
-			&& isset($log->context['exception'])
-			&& $log->context['exception'] instanceof \Exception) {
-			$trace = "\n" . $log->context['exception']->getTraceAsString();
+		if ($log->has('context')) {
+			$context = $log->context;
+			if (isset($context['exception'])
+				&& $context['exception'] instanceof \Exception) {
+				$trace = PHP_EOL . $context['exception']->getTraceAsString();
+				unset($context['exception']);
+			}
+			$context_info = PHP_EOL . var_export($context, true);
 		}
 
 		return sprintf(
-			'[%s] %s: %s%s%s%s',
+			'[%s] %s: %s%s%s%s%s',
 			$log->timestamp->format('Y/m/d H:i:s'),
 			$log->level->getSeverity(),
 			$method,
 			$log->message,
+			$context_info,
 			$caller_info,
 			$trace
 		);
