@@ -189,11 +189,13 @@ class Logger implements LoggerInterface {
 			'timestamp'	=> new \DateTime(),
 			'level'		=> $level,
 			'message'	=> $this->interpolate((string) $message, $context),
-			'context'	=> $context,
 			'class'		=> $caller['class'],
 			'caller'	=> $caller,
 			'name'		=> $this->getName()
 		));
+		if (! empty($context)) {
+			$log->set('context', $context);
+		}
 
 		// notify to writer
 		foreach ($this->getWriters() as $writer) {

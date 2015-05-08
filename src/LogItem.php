@@ -51,6 +51,17 @@ class LogItem extends \ArrayObject {
 	}
 
 	/**
+	 * Alias of offsetSet()
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 * @return void
+	 */
+	public function set($key, $value) {
+		$this->offsetSet($key, $value);
+	}
+
+	/**
 	 * Check if LogItem has the givenkey
 	 *
 	 * @param string $key
