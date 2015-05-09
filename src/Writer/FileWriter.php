@@ -32,8 +32,8 @@ class FileWriter extends AbstractWriter {
 			}
 			$this->_stream = $streamOrFile;
 		} else {
-			$this->stream = fopen($streamOrFile, 'a');
-			if (! $this->stream) {
+			$this->_stream = fopen($streamOrFile, 'a');
+			if (! $this->_stream) {
 				throw new \RuntimeException('Failed to open file: ' . $streamOrFile);
 			}
 		}
@@ -48,6 +48,6 @@ class FileWriter extends AbstractWriter {
 	 * @return void
 	 */
 	protected function doWrite($formatted_log) {
-		fwrite($this->stream,  $formatted_log . PHP_EOL);
+		fwrite($this->_stream,  $formatted_log . PHP_EOL);
 	}
 }

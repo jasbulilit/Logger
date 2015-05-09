@@ -10,6 +10,15 @@ namespace SimpleLogger;
 
 /**
  * Log item work as array
+ *
+ * @property \DateTime $timestamp
+ * @property integer $level
+ * @property string $message
+ * @property string $class
+ * @property array $caller
+ * @property string $name
+ * @property array $context
+ * @property \Exception $exception
  */
 class LogItem extends \ArrayObject {
 

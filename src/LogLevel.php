@@ -35,6 +35,8 @@ class LogLevel {
 		self::DEBUG		=> 'DEBUG'
 	);
 
+	private $_level;
+
 	/**
 	 * @param integer $level
 	 * @throws \InvalidArgumentException
