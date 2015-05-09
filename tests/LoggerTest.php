@@ -14,6 +14,18 @@ namespace SimpleLogger;
 class LoggerTest extends \PHPUnit_Framework_TestCase {
 
 	/**
+	 * @covers ::__construct
+	 */
+	public function testConstructorWithWriter() {
+		$writer = $this->getMock('\SimpleLogger\WriterInterface');
+		$logger = new Logger('hoge', $writer);
+
+		$writers = $logger->getWriters();
+		$this->assertEquals($writer, $writers[0]);
+	}
+
+	/**
+	 * @covers ::__construct
 	 * @covers ::getName
 	 */
 	public function testGetName() {
@@ -81,6 +93,94 @@ class LoggerTest extends \PHPUnit_Framework_TestCase {
 		$logger = new Logger();
 		$logger->addWriter($writer);
 		$logger->log($level, $message);
+	}
+
+	/**
+	 * @dataProvider logMethodProvider
+	 * @covers ::log
+	 * @covers ::interpolate
+	 */
+	public function testLogWithContext($method, $level) {
+		$message = 'Test message Group={group} User={user_id}';
+		$context = array(
+				'user_id'	=> 1,
+				'group'		=> 'dummy group'
+		);
+		$expected_message = "Test message Group={$context['group']} User={$context['user_id']}";
+
+		$writer = $this->getMock('\SimpleLogger\WriterInterface');
+		$writer->method('filter')->willReturn(true);
+		$writer->expects($this->once())
+			->method('write')
+			->with($this->callback(function(LogItem $log) use ($level, $expected_message) {
+				if ($log->level->getLevel() != $level) {
+					return false;
+				}
+				if ($log->message != $expected_message) {
+					return false;
+				}
+				if (! $log->has('context')) {
+					return false;
+				}
+				return true;
+			}));
+
+		$logger = new Logger();
+		$logger->addWriter($writer);
+		$logger->log($level, $message, $context);
+	}
+
+	/**
+	 * @covers ::log
+	 */
+	public function testLogWithException() {
+		$exception = new \Exception('Dummy Exception');
+
+		$test_case = $this;
+		$writer = $this->getMock('\SimpleLogger\WriterInterface');
+		$writer->method('filter')->willReturn(true);
+		$writer->expects($this->once())
+			->method('write')
+			->with($this->callback(function(LogItem $log) use ($test_case, $exception) {
+				if ($log->has('context')) {
+					return false;
+				}
+				if (! $log->has('exception')) {
+					return false;
+				}
+
+				$test_case->assertEquals($exception, $log->exception);
+				return true;
+			}));
+
+		$logger = new Logger();
+		$logger->addWriter($writer);
+		$logger->log(LogLevel::INFO, 'Test message', array('exception' => $exception));
+	}
+
+	/**
+	 * @covers ::log
+	 */
+	public function testLogWithArrayMessage() {
+		$message = array(
+			'foo'	=> 'FOO',
+			'bar'	=> 'BAR'
+		);
+
+		$writer = $this->getMock('\SimpleLogger\WriterInterface');
+		$writer->method('filter')->willReturn(true);
+		$writer->expects($this->once())
+			->method('write')
+			->with($this->callback(function(LogItem $log) use ($message) {
+				if ($log->message != var_export($message, true)) {
+					return false;
+				}
+				return true;
+			}));
+
+		$logger = new Logger();
+		$logger->addWriter($writer);
+		$logger->log(LogLevel::INFO, $message);
 	}
 
 	/**
@@ -162,41 +262,6 @@ class LoggerTest extends \PHPUnit_Framework_TestCase {
 		LoggerWrapper::notice($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
 		LoggerWrapper::info($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
 		LoggerWrapper::debug($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
-	}
-
-	/**
-	 * @dataProvider logMethodProvider
-	 * @covers ::log
-	 * @covers ::interpolate
-	 */
-	public function testLogWithContext($method, $level) {
-		$message = 'Test message Group={group} User={user_id}';
-		$context = array(
-			'user_id'	=> 1,
-			'group'		=> 'dummy group'
-		);
-		$expected_message = "Test message Group={$context['group']} User={$context['user_id']}";
-
-		$writer = $this->getMock('\SimpleLogger\WriterInterface');
-		$writer->method('filter')->willReturn(true);
-		$writer->expects($this->once())
-			->method('write')
-			->with($this->callback(function(LogItem $log) use ($level, $expected_message) {
-				if ($log->level->getLevel() != $level) {
-					return false;
-				}
-				if ($log->message != $expected_message) {
-					return false;
-				}
-				if (! $log->has('context')) {
-					return false;
-				}
-				return true;
-			}));
-
-		$logger = new Logger();
-		$logger->addWriter($writer);
-		$logger->log($level, $message, $context);
 	}
 
 	/**

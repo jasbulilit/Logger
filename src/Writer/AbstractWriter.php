@@ -159,7 +159,7 @@ abstract class AbstractWriter implements WriterInterface {
 	 * @return boolean
 	 */
 	protected function filterByLevel(LogLevel $level) {
-		return ($level->comparePriority($this->getLevel()) >= 0);
+		return ($this->getLevel()->comparePriority($level) >= 0);
 	}
 
 	/**

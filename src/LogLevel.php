@@ -80,6 +80,6 @@ class LogLevel {
 		if ($this->getPriority() == $log_level->getPriority()) {
 			return 0;
 		}
-		return ($this->getPriority() < $log_level->getPriority()) ? 1 : -1;
+		return ($this->getPriority() > $log_level->getPriority()) ? 1 : -1;
 	}
 }
