@@ -12,7 +12,7 @@ namespace SimpleLogger;
  * Log item work as array
  *
  * @property \DateTime $timestamp
- * @property integer $level
+ * @property LogLevel $level
  * @property string $message
  * @property string $class
  * @property array $caller

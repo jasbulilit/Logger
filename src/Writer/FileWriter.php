@@ -48,6 +48,6 @@ class FileWriter extends AbstractWriter {
 	 * @return void
 	 */
 	protected function doWrite($formatted_log) {
-		fwrite($this->_stream,  $formatted_log . PHP_EOL);
+		fwrite($this->_stream, $formatted_log . PHP_EOL);
 	}
 }

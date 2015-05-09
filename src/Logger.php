@@ -225,9 +225,9 @@ class Logger implements LoggerInterface {
 	 */
 	private function _getCaller() {
 		$trace_list = debug_backtrace(false);
-		array_shift($trace_list);	// _getCaller()
+		array_shift($trace_list); // _getCaller()
 
-		$trace	= array_shift($trace_list);	// log()
+		$trace = array_shift($trace_list); // log()
 		if (isset($trace_list[0])
 			&& $trace_list[0]['class'] == __CLASS__) {
 			// methods of the eight log levels
@@ -238,7 +238,7 @@ class Logger implements LoggerInterface {
 			$trace = array_shift($trace_list);
 		}
 
-		$caller	= array(
+		$caller = array(
 			'file'		=> $trace['file'],
 			'line'		=> $trace['line'],
 			'class'		=> null,
