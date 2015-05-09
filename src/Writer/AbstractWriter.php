@@ -123,15 +123,13 @@ abstract class AbstractWriter implements WriterInterface {
 		}
 
 		$context_info = '';
-		$trace = '';
 		if ($log->has('context')) {
-			$context = $log->context;
-			if (isset($context['exception'])
-				&& $context['exception'] instanceof \Exception) {
-				$trace = PHP_EOL . $context['exception']->getTraceAsString();
-				unset($context['exception']);
-			}
-			$context_info = PHP_EOL . var_export($context, true);
+			$context_info = PHP_EOL . var_export($log->context, true);
+		}
+
+		$trace = '';
+		if ($log->has('exception')) {
+			$trace = PHP_EOL . $log->exception->getTraceAsString();
 		}
 
 		return sprintf(

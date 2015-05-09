@@ -84,6 +84,87 @@ class LoggerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers ::_getCaller
+	 */
+	public function testGetCallerMethod() {
+		$message = 'Test message';
+
+		$test_case = $this;
+		$writer = $this->getMock('\SimpleLogger\WriterInterface');
+		$writer->method('filter')
+			->willReturn(true)
+			->with($this->callback(function(LogItem $log) use ($test_case) {
+				$context = $log->context;
+				$caller  = $log->caller;
+
+				$test_case->assertEquals($context['class'], $caller['class'], 'Caller class is not expected.');
+				$test_case->assertEquals($context['method'], $caller['method'], 'Caller method is not expected.');
+				$test_case->assertEquals($context['line'], $caller['line'], 'Caller line is not expected.');
+
+				return true;
+			}));
+
+		$logger = new Logger();
+		$logger->addWriter($writer);
+		$logger->log(1, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->log(2, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->log(3, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->log(4, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->log(5, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->log(6, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->log(7, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->log(8, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->emergency($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->alert($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->critical($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->error($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->warning($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->notice($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->info($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		$logger->debug($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+	}
+
+	/**
+	 * @covers ::_getCaller
+	 */
+	public function testGetCallerWithWrapper() {
+		$message = 'Test message';
+
+		$test_case = $this;
+		$writer = $this->getMock('\SimpleLogger\WriterInterface');
+		$writer->method('filter')
+			->willReturn(true)
+			->with($this->callback(function(LogItem $log) use ($test_case) {
+				$context = $log->context;
+				$caller  = $log->caller;
+
+				$test_case->assertEquals($context['class'], $caller['class'], 'Caller class is not expected.');
+				$test_case->assertEquals($context['method'], $caller['method'], 'Caller method is not expected.');
+				$test_case->assertEquals($context['line'], $caller['line'], 'Caller line is not expected.');
+
+				return true;
+			}));
+
+		LoggerWrapper::setLogger(new Logger('dummy', $writer));
+		LoggerWrapper::log(1, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::log(2, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::log(3, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::log(4, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::log(5, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::log(6, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::log(7, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::log(8, $message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::emergency($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::alert($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::critical($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::error($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::warning($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::notice($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::info($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+		LoggerWrapper::debug($message, array('class' => __CLASS__, 'method' => __METHOD__, 'line' => __LINE__));
+	}
+
+	/**
 	 * @dataProvider logMethodProvider
 	 * @covers ::log
 	 * @covers ::interpolate
@@ -222,5 +303,23 @@ class LoggerTest extends \PHPUnit_Framework_TestCase {
 			array('alert',		LogLevel::ALERT),
 			array('emergency',	LogLevel::EMERGENCY),
 		);
+	}
+}
+
+class LoggerWrapper {
+	private static $_logger;
+
+	public static function __callStatic($method_nm, $args) {
+		if ($method_nm == 'log') {
+			self::$_logger->$method_nm($args[0], $args[1], $args[2]);
+		} else {
+			self::$_logger->$method_nm($args[0], $args[1]);
+		}
+	}
+
+	public static function setLogger($logger) {
+		// __callStatic() call self static method internally
+		$logger->addCallerSkipCount(2);
+		self::$_logger = $logger;
 	}
 }

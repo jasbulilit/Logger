@@ -29,7 +29,7 @@ class LogItem extends \ArrayObject {
 	public function __construct($log) {
 		assert($log['timestamp'] instanceof \DateTime);
 		assert(isset($log['message']));
-		assert(isset($log['class']));
+		assert(array_key_exists('class', $log));
 
 		$log['level'] = new LogLevel($log['level']);
 
