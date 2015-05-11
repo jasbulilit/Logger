@@ -30,21 +30,27 @@ class FileWriterTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers ::__construct
-	 * @expectedException \RuntimeException
+	 * @covers ::doWrite
 	 */
-	public function testConstructorWithNonWritableStream() {
-		$this->markTestIncomplete();
+	public function testDoWrite() {
+		$stream = tmpfile();
+		$writer = new Writer\FileWriter($stream);
 
-		$writer = new Writer\FileWriter('php://stdin');
-		$writer->write(new LogItem($this->_getDummyLog()));
+		for ($i=1; $i<=5; $i++) {
+			$writer->write(new LogItem($this->_getDummyLog('Test message ' . $i)));
+		}
+
+		fseek($stream, 0);
+		for ($i=1; $i<=5; $i++) {
+			$this->assertContains('Test message ' . $i, fgets($stream));
+		}
 	}
 
-	private function _getDummyLog() {
+	private function _getDummyLog($message = 'Test message') {
 		return array(
 			'timestamp'	=> new \DateTime(),
 			'level'		=> LogLevel::INFO,
-			'message'	=> 'Test message',
+			'message'	=> $message,
 			'class'		=> null,
 			'name'		=> 'DummyLoggers'
 		);
